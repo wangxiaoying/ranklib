@@ -15,11 +15,14 @@ import ciir.umass.edu.learning.RankList;
 import ciir.umass.edu.learning.SparseDataPoint;
 import ciir.umass.edu.utilities.FileUtils;
 import ciir.umass.edu.utilities.RankLibError;
+import ciir.umass.edu.features.FeatureStats;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 
 public class FeatureManager {
 
@@ -30,11 +33,16 @@ public class FeatureManager {
 		
 		List<String> rankingFiles = new ArrayList<>();
 		String outputDir = "";
+        	String modelFileName = "";
 		boolean shuffle = false;
+		boolean doFeatureStats = false;
+		
 		int nFold = 0;
 		float tvs = -1;//train-validation split in each fold
+                int argsLen = args.length;
 		
-		if(args.length < 3)
+		if( (argsLen < 3) && !Arrays.asList (args).contains ("-feature_stats") ||
+		    (argsLen != 2) && Arrays.asList (args).contains ("-feature_stats") )
 		{
 			System.out.println("Usage: java -cp bin/RankLib.jar ciir.umass.edu.features.FeatureManager <Params>");
 			System.out.println("Params:");
@@ -53,7 +61,14 @@ public class FeatureManager {
 			
 			System.out.println("");
 			System.out.println("  NOTE: If both -shuffle and -k are specified, the input data will be shuffled and then sequentially partitioned.");
-			System.out.println("");
+
+			System.out.println ("");
+			System.out.println ("Feature Statistics -- Saved model feature use frequencies and statistics.");
+			System.out.println ("-input and -output parameters are not used.");
+         		System.out.println ("\t-feature_stats\tName of a saved, feature-limited, LTR model text file.");
+        		System.out.println ("\t\t\tDoes not process Coordinate Ascent, LambdaRank, ListNet or RankNet models.");
+        		System.out.println ("\t\t\tas they include all features rather than selected feature subsets.");
+			System.out.println ("");
 			return;
 		}
 		
@@ -69,6 +84,11 @@ public class FeatureManager {
 				tvs = Float.parseFloat(args[++i]);
 			else if (args[i].equalsIgnoreCase ("-output"))
 				outputDir = FileUtils.makePathStandard(args[++i]);
+
+			else if (args[i].equalsIgnoreCase ("-feature_stats")) {
+			    doFeatureStats = true;
+			    modelFileName = args[++i];
+			}
 		}		
 	
 		if(shuffle || nFold > 0)
@@ -120,6 +140,17 @@ public class FeatureManager {
 							"Occured in FeatureManager::main(): ", ex);
 				}
 			}
+		}
+		else if (doFeatureStats) {
+		    //- Produce some a frequency distribution of chosen model features with some statistics.
+		    try {
+			FeatureStats fs = new FeatureStats (modelFileName);
+			fs.writeFeatureStats ();
+		    }
+		    catch (Exception ex) {
+			throw RankLibError.create ("Failure processing saved " + modelFileName + " model file.\n" +
+						   "Error occurred in FeatureManager::main(): ", ex);
+		    }
 		}
 	}
 	
@@ -450,4 +481,5 @@ public class FeatureManager {
 			out.newLine();
 		}
 	}
-}
+    
+}  //- end class FeatureManager
