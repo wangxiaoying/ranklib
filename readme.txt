@@ -1,8 +1,10 @@
-Date:		December, 2013.
-Version:	2.3
+Date:		December, 2018.
+Version:	2.11
 ======================================
 
-WHAT'S NEW
+========================
+v 2.3
+------
 - [bugfix] RankLib crashes when #features < #threads with some algorithms.
 - [bugfix] Normalization issue with RankBoost (the command "-test <test-data> -load <RB-model-file> -norm zscore/sum" incorrectly normalizes the test data).
 - [bugfix] Reciprocal rank is always measured off the entire ranked list, regardless of the specified cut-off point.
