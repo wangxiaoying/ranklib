@@ -59,6 +59,23 @@ public abstract class MetricScorer {
 			rel[i] = (int)rl.get(i).getLabel();
 		return rel;
 	}
+
+	// normalize labels within [0, k]
+	protected double[] getNormalizedRelevanceLabels(RankList rl)
+	{
+		double[] rel = new double[rl.size()];
+		double sum = 0.0;
+		for (int i = 0; i < rl.size(); ++i)
+		{
+			rel[i] = (double)rl.get(i).getLabel();
+			sum += rel[i];
+		}
+		for (int i = 0; i < rl.size(); ++i)
+		{
+			rel[i] = (rel[i] / sum) * this.k;
+		}
+		return rel;
+	}
 	
 	public abstract double score(RankList rl);
 	public abstract MetricScorer copy();

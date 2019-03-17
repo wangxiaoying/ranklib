@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class MetricScorerFactory {
 
-	private static MetricScorer[] mFactory = new MetricScorer[]{new APScorer(), new NDCGScorer(), new DCGScorer(), new PrecisionScorer(), new ReciprocalRankScorer(), new BestAtKScorer(), new ERRScorer()};
+	private static MetricScorer[] mFactory = new MetricScorer[]{new APScorer(), new NDCGScorer(), new DCGScorer(), new PrecisionScorer(), new ReciprocalRankScorer(), new BestAtKScorer(), new ERRScorer(), new WINDCGScorer()};
 	private static HashMap<String, MetricScorer> map = new HashMap<String, MetricScorer>();
 	
 	public MetricScorerFactory()
@@ -28,6 +28,7 @@ public class MetricScorerFactory {
 		map.put("RR", new ReciprocalRankScorer());
 		map.put("BEST", new BestAtKScorer());
 		map.put("ERR", new ERRScorer());
+		map.put("WINDCG", new WINDCGScorer());
 	}
 	public MetricScorer createScorer(METRIC metric)
 	{
