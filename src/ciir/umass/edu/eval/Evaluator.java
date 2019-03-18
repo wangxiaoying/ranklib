@@ -46,12 +46,13 @@ public class Evaluator {
 		
 		String[] rType = new String[] { "MART", "RankNet", "RankBoost", "AdaRank", "Coordinate Ascent",
                                                 "LambdaRank", "LambdaMART", "ListNet", "Random Forests", 
-                                                "Linear Regression" };
+                                                "Linear Regression", "WeightedLambdaMART" };
 		RANKER_TYPE[] rType2 = new RANKER_TYPE[] { RANKER_TYPE.MART, RANKER_TYPE.RANKNET, 
                                                            RANKER_TYPE.RANKBOOST, RANKER_TYPE.ADARANK, 
                                                            RANKER_TYPE.COOR_ASCENT, RANKER_TYPE.LAMBDARANK, 
                                                            RANKER_TYPE.LAMBDAMART, RANKER_TYPE.LISTNET, 
-                                                           RANKER_TYPE.RANDOM_FOREST, RANKER_TYPE.LINEAR_REGRESSION };
+                                                           RANKER_TYPE.RANDOM_FOREST, RANKER_TYPE.LINEAR_REGRESSION,
+														   RANKER_TYPE.WLAMBDAMART};
 		
 		String trainFile = "";
 		String featureDescriptionFile = "";
@@ -93,11 +94,12 @@ public class Evaluator {
 			System.out.println("\t\t\t\t7: ListNet");
 			System.out.println("\t\t\t\t8: Random Forests");
 			System.out.println("\t\t\t\t9: Linear regression (L2 regularization)");
+			System.out.println("\t\t\t\t10: WeightedLambdaMART");
 			System.out.println("\t[ -feature <file> ]\tFeature description file: list features to be considered by the learner, each on a separate line");
 			System.out.println("\t\t\t\tIf not specified, all features will be used.");
 			//System.out.println("\t[ -metric2t <metric> ]\tMetric to optimize on the training data. Supported: MAP, NDCG@k, DCG@k, P@k, RR@k, BEST@k, ERR@k (default=" + trainMetric + ")");
 			System.out.println("\t[ -metric2t <metric> ]\tMetric to optimize on the training data.  " +
-                                           "Supported: MAP, NDCG@k, DCG@k, P@k, RR@k, ERR@k (default=" + trainMetric + ")");
+                                           "Supported: MAP, NDCG@k, DCG@k, P@k, RR@k, ERR@k, WINDCG@k (default=" + trainMetric + ")");
 			System.out.println("\t[ -gmax <label> ]\tHighest judged relevance label. It affects the calculation of ERR " +
                                            "(default=" + (int)SimpleMath.logBase2(ERRScorer.MAX) + ", i.e. 5-point scale {0,1,2,3,4})");
 			System.out.println("\t[ -qrel <file> ]\tTREC-style relevance judgment file. It only affects MAP and NDCG (default=unspecified)");

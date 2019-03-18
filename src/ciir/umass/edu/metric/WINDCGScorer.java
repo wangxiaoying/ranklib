@@ -5,16 +5,28 @@ import ciir.umass.edu.utilities.Sorter;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 // Weighted Improved NDCG Scorer
 public class WINDCGScorer extends WeightedMetricScorer{
     protected HashMap<String, Double> idealIDCGScore = null;
+    protected double decayRate = 0.9;
+    protected static double[] discount = null;//cache
 
     public WINDCGScorer()
     {
         super();
         idealIDCGScore = new HashMap<>();
+        if(discount == null)
+        {
+            discount = new double[5000];
+            discount[0] = 1;
+            for(int i = 1; i < discount.length; i++)
+                discount[i] = discount[i - 1] * decayRate;
+        }
     }
+
+    public void setDecayRate(double dr) {decayRate = dr;}
 
     @Override
     public double idealScore(RankList rl) {
@@ -52,10 +64,35 @@ public class WINDCGScorer extends WeightedMetricScorer{
             idealScore = getIDCGScore(rel, size, true);
             idealIDCGScore.put(rl.getID(), idealScore);
         }
-        if (idealScore <= 0) {System.out.println("ideal score <= 0! " + idealScore); return 0;}
+        if (idealScore <= 0) {System.err.println("ideal score <= 0! " + idealScore); return 0;}
+        if (score > idealScore) System.err.println("score is larger than ideal: " + score + ">" + idealScore);
 
         // return score normalized by ideal
         return score / idealScore;
+    }
+
+    // un-normalized score
+    protected double naiveScore(RankList rl)
+    {
+        if(rl.size() == 0) return 0;
+
+        // compute score
+        int size = (k > rl.size() || k <= 0) ? rl.size() : k;
+        double rel[] = getNormalizedRelevanceLabels(rl);
+        return getIDCGScore(rel, size, false);
+    }
+
+    // optimize here: score/ideal * ideal/sumIdeal = score/sumIdeal
+    public double score(List<RankList> rl)
+    {
+        double score = 0.0;
+        double sumIdealScore = 0.0;
+        for(int i = 0; i < rl.size(); ++i)
+        {
+            score += naiveScore(rl.get(i));
+            sumIdealScore += idealScore(rl.get(i));
+        }
+        return score / sumIdealScore;
     }
 
     protected double getIDCGScore(double rel[], int topK, Boolean ideal)
@@ -103,25 +140,25 @@ public class WINDCGScorer extends WeightedMetricScorer{
         double rel[] = getNormalizedRelevanceLabels(rl);
 
         // compute ideal score
-        double idealScore = 0;
         // check cache first
         Double s = idealIDCGScore.get(rl.getID());
-        idealScore = (s != null) ? s : getIDCGScore(rel, size, true);
+        double idealScore = (s != null) ? s : getIDCGScore(rel, size, true);
 
-        if (idealScore <= 0) {System.out.println("ideal score <= 0! " + idealScore); return changes;}
-
+        if (idealScore <= 0) {System.err.println("ideal score <= 0! " + idealScore); return changes;}
         for(int i=0;i<size;i++)
         {
             for(int j=i+1;j<rl.size();j++)
             {
-                changes[j][i] = changes[i][j] = (discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j])) / idealScore;
+                // maintain the weight, therefore do not divide ideal here
+                changes[j][i] = changes[i][j] = (discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]));
+                // changes[j][i] = changes[i][j] = ((discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]))) / idealScore;
             }
         }
 
         return changes;
     }
 
-    // rel: ground truth / normalized ground truth
+    // rel: have been normalized [0, MIN(k, 20)]
     protected double gain(double rel)
     {
         return Math.pow(2.0, rel)-1;
@@ -130,6 +167,19 @@ public class WINDCGScorer extends WeightedMetricScorer{
     // pos: the ranking position in the list
     protected double discount(int pos)
     {
-        return 1 / (1<<(pos-1));
+        if(pos < discount.length)
+            return discount[pos];
+
+        //we need to expand our cache
+        int cacheSize = discount.length + 1000;
+        while(cacheSize <= pos)
+            cacheSize += 1000;
+        double[] tmp = new double[cacheSize];
+        System.arraycopy(discount, 0, tmp, 0, discount.length);
+        for(int i=discount.length;i<tmp.length;i++)
+            discount[i] = discount[i-1] * decayRate;
+        discount = tmp;
+
+        return discount[pos];
     }
 }

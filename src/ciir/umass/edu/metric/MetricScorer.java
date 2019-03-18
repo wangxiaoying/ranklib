@@ -60,7 +60,7 @@ public abstract class MetricScorer {
 		return rel;
 	}
 
-	// normalize labels within [0, k]
+	// normalize labels within [0, MIN(k, 20)]
 	protected double[] getNormalizedRelevanceLabels(RankList rl)
 	{
 		double[] rel = new double[rl.size()];
@@ -72,7 +72,7 @@ public abstract class MetricScorer {
 		}
 		for (int i = 0; i < rl.size(); ++i)
 		{
-			rel[i] = (rel[i] / sum) * this.k;
+			rel[i] = (rel[i] / sum) * Math.min(this.k, 20);
 		}
 		return rel;
 	}
@@ -81,4 +81,5 @@ public abstract class MetricScorer {
 	public abstract MetricScorer copy();
 	public abstract String name();
 	public abstract double[][] swapChange(RankList rl);
+	public double idealScore(RankList rl) {return 0;};
 }

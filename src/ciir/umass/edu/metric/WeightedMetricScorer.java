@@ -18,6 +18,4 @@ public abstract class WeightedMetricScorer extends MetricScorer {
         }
         return score / sumIdealScore;
     }
-
-    public abstract double idealScore(RankList rl);
 }

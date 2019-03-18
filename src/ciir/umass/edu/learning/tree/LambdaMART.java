@@ -181,7 +181,7 @@ public class LambdaMART extends Ranker {
 		PRINTLN("---------------------------------");
 		PRINTLN("Training starts...");
 		PRINTLN("---------------------------------");
-		PRINTLN(new int[]{7, 9, 9}, new String[]{"#iter", scorer.name()+"-T", scorer.name()+"-V"});
+		PRINTLN(new int[]{7, scorer.name().length()+2, scorer.name().length()+2}, new String[]{"#iter", scorer.name()+"-T", scorer.name()+"-V"});
 		PRINTLN("---------------------------------");		
 		
 		//Start the gradient boosting process
@@ -235,7 +235,7 @@ public class LambdaMART extends Ranker {
 			//However, this function is more efficient since it uses the cached outputs of the model (as opposed to re-evaluating the model 
 			//on the entire training set).
 			
-			PRINT(new int[]{9}, new String[]{SimpleMath.round(scoreOnTrainingData, 4) + ""});			
+			PRINT(new int[]{scorer.name().length()+2}, new String[]{SimpleMath.round(scoreOnTrainingData, 4) + ""});
 			
 			//Evaluate the current model on the validation data (if available)
 			if(validationSamples != null)
@@ -248,7 +248,7 @@ public class LambdaMART extends Ranker {
 				//again, equivalent to scoreOnValidation=scorer.score(rank(validationSamples)), but more efficient since we use the cached models' outputs
 				double score = computeModelScoreOnValidation();
 				
-				PRINT(new int[]{9}, new String[]{SimpleMath.round(score, 4) + ""});
+				PRINT(new int[]{scorer.name().length()+2}, new String[]{SimpleMath.round(score, 4) + ""});
 				if(score > bestScoreOnValidationData)
 				{
 					bestScoreOnValidationData = score;
@@ -476,6 +476,8 @@ public class LambdaMART extends Ranker {
 		int[] idx = MergeSorter.sort(scores, false);
 		return new RankList(orig, idx);
 	}
+
+
 
 	protected float computeModelScoreOnTraining() 
 	{
