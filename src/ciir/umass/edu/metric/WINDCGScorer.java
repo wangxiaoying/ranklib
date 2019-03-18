@@ -10,6 +10,7 @@ import java.util.List;
 // Weighted Improved NDCG Scorer
 public class WINDCGScorer extends WeightedMetricScorer{
     protected HashMap<String, Double> idealIDCGScore = null;
+    protected HashMap<String, Double> weights = null;
     protected double decayRate = 0.9;
     protected static double[] discount = null;//cache
 
@@ -17,6 +18,7 @@ public class WINDCGScorer extends WeightedMetricScorer{
     {
         super();
         idealIDCGScore = new HashMap<>();
+        weights = new HashMap<>();
         if(discount == null)
         {
             discount = new double[5000];
@@ -28,7 +30,6 @@ public class WINDCGScorer extends WeightedMetricScorer{
 
     public void setDecayRate(double dr) {decayRate = dr;}
 
-    @Override
     public double idealScore(RankList rl) {
         if(rl.size() == 0) return 0;
 
@@ -72,7 +73,7 @@ public class WINDCGScorer extends WeightedMetricScorer{
     }
 
     // un-normalized score
-    protected double naiveScore(RankList rl)
+    /*protected double naiveScore(RankList rl)
     {
         if(rl.size() == 0) return 0;
 
@@ -93,6 +94,28 @@ public class WINDCGScorer extends WeightedMetricScorer{
             sumIdealScore += idealScore(rl.get(i));
         }
         return score / sumIdealScore;
+    }*/
+
+    @Override
+    public double weight(RankList rl) {
+        if(rl.size() == 0) return 0;
+
+        // check cache first
+        Double w = weights.get(rl.getID());
+        if (w != null) return w;
+
+        // compute weight for a list
+        int size = (k > rl.size() || k <= 0) ? rl.size() : k;
+        double rel[] = getNormalizedRelevanceLabels(rl);
+        int[] idx = Sorter.sort(rel, false);
+        double weight = 0;
+        for (int i = 0; i < size; ++i)
+        {
+            weight += rel[idx[i]];
+        }
+        weights.put(rl.getID(), weight);
+
+        return weight;
     }
 
     protected double getIDCGScore(double rel[], int topK, Boolean ideal)
@@ -140,9 +163,11 @@ public class WINDCGScorer extends WeightedMetricScorer{
         double rel[] = getNormalizedRelevanceLabels(rl);
 
         // compute ideal score
-        // check cache first
         Double s = idealIDCGScore.get(rl.getID());
         double idealScore = (s != null) ? s : getIDCGScore(rel, size, true);
+
+        // compute weight
+        double weight = weight(rl);
 
         if (idealScore <= 0) {System.err.println("ideal score <= 0! " + idealScore); return changes;}
         for(int i=0;i<size;i++)
@@ -150,8 +175,8 @@ public class WINDCGScorer extends WeightedMetricScorer{
             for(int j=i+1;j<rl.size();j++)
             {
                 // maintain the weight, therefore do not divide ideal here
-                changes[j][i] = changes[i][j] = (discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]));
-                // changes[j][i] = changes[i][j] = ((discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]))) / idealScore;
+                // changes[j][i] = changes[i][j] = (discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]));
+                changes[j][i] = changes[i][j] = (((discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]))) / idealScore) * weight;
             }
         }
 

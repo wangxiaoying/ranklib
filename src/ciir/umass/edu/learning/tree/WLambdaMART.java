@@ -10,7 +10,7 @@ import java.util.List;
 
 public class WLambdaMART extends LambdaMART {
 
-    protected double sumIdealScore = -1;
+    protected double sumWeight = -1;
 
     public WLambdaMART()
     {
@@ -59,27 +59,27 @@ public class WLambdaMART extends LambdaMART {
         return (float)scorer.score(rlList);
     }
 
-    /*protected void computePseudoResponses()
+    protected void computePseudoResponses()
     {
         super.computePseudoResponses();
 
-        // only need to sum up once
-        if (sumIdealScore < 0)
+        // only need to sum up once, here only have one thread
+        if (sumWeight < 0)
         {
             double sum = 0;
             for (int i = 0; i < samples.size(); ++i)
             {
-                sum += scorer.idealScore(samples.get(i));
+                sum += scorer.weight(samples.get(i));
             }
-            sumIdealScore = sum;
+            sumWeight = sum;
         }
 
-        if (sumIdealScore <= 0) {System.err.println("sum of ideal score less than zero!"); return;}
+        if (sumWeight <= 0) {System.err.println("sum of weight score less than zero!"); return;}
         for (int i = 0; i < weights.length; ++i)
         {
-            weights[i] /= sumIdealScore;
-            pseudoResponses[i] /= sumIdealScore;
+            weights[i] /= sumWeight;
+            pseudoResponses[i] /= sumWeight;
         }
-    }*/
+    }
 
 }

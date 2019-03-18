@@ -81,5 +81,5 @@ public abstract class MetricScorer {
 	public abstract MetricScorer copy();
 	public abstract String name();
 	public abstract double[][] swapChange(RankList rl);
-	public double idealScore(RankList rl) {return 0;};
+	public double weight(RankList rl) {return 0;};
 }
