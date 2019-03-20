@@ -2,7 +2,7 @@ package ciir.umass.edu.learning.tree;
 
 import ciir.umass.edu.learning.RankList;
 import ciir.umass.edu.learning.Ranker;
-import ciir.umass.edu.metric.WeightedMetricScorer;
+import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.utilities.MergeSorter;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class WLambdaMART extends LambdaMART {
         super();
     }
 
-    public WLambdaMART(List<RankList> samples, int[] features, WeightedMetricScorer scorer)
+    public WLambdaMART(List<RankList> samples, int[] features, MetricScorer scorer)
     {
         super(samples, features, scorer);
     }
