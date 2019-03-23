@@ -11,6 +11,7 @@ package ciir.umass.edu.learning;
 
 import ciir.umass.edu.learning.boosting.AdaRank;
 import ciir.umass.edu.learning.boosting.RankBoost;
+import ciir.umass.edu.learning.boosting.WAdaRank;
 import ciir.umass.edu.learning.neuralnet.LambdaRank;
 import ciir.umass.edu.learning.neuralnet.ListNet;
 import ciir.umass.edu.learning.neuralnet.RankNet;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public class RankerFactory {
 
-	protected Ranker[] rFactory = new Ranker[]{new MART(), new RankBoost(), new RankNet(), new AdaRank(), new CoorAscent(), new LambdaRank(), new LambdaMART(), new ListNet(), new RFRanker(), new LinearRegRank(), new WLambdaMART()};
+	protected Ranker[] rFactory = new Ranker[]{new MART(), new RankBoost(), new RankNet(), new AdaRank(), new CoorAscent(), new LambdaRank(), new LambdaMART(), new ListNet(), new RFRanker(), new LinearRegRank(), new WLambdaMART(), new WAdaRank()};
 	protected static HashMap<String, RANKER_TYPE> map = new HashMap<String, RANKER_TYPE>();
 	
 	public RankerFactory()
@@ -50,6 +51,7 @@ public class RankerFactory {
 		map.put(createRanker(RANKER_TYPE.RANDOM_FOREST).name().toUpperCase(), RANKER_TYPE.RANDOM_FOREST);
 		map.put(createRanker(RANKER_TYPE.LINEAR_REGRESSION).name().toUpperCase(), RANKER_TYPE.LINEAR_REGRESSION);
 		map.put(createRanker(RANKER_TYPE.WLAMBDAMART).name().toUpperCase(), RANKER_TYPE.WLAMBDAMART);
+		map.put(createRanker(RANKER_TYPE.WADARANK).name().toUpperCase(), RANKER_TYPE.WADARANK);
 	}	
 	public Ranker createRanker(RANKER_TYPE type)
 	{
