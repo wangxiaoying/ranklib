@@ -8,6 +8,9 @@ import ciir.umass.edu.utilities.MergeSorter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class implements the Improved LambdaMART algorithm.
+ */
 public class WLambdaMART extends LambdaMART {
 
     protected double sumIdealScore = -1;
@@ -75,10 +78,15 @@ public class WLambdaMART extends LambdaMART {
         }
 
         if (sumIdealScore <= 0) {System.err.println("sum of ideal score less than zero!"); return;}
+        // need to multiply size of samples since it will gonna do the average
         for (int i = 0; i < weights.length; ++i)
         {
-            weights[i] /= sumIdealScore;
-            pseudoResponses[i] /= sumIdealScore;
+            weights[i] = weights[i] / sumIdealScore;
+            pseudoResponses[i] = pseudoResponses[i] / sumIdealScore;
+            // weights[i] = weights[i];
+            // pseudoResponses[i] = pseudoResponses[i];
+            // weights[i] = weights[i] * samples.size() / sumIdealScore;
+            // pseudoResponses[i] = pseudoResponses[i] * samples.size() / sumIdealScore;
         }
     }*/
 

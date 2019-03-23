@@ -46,13 +46,13 @@ public class Evaluator {
 		
 		String[] rType = new String[] { "MART", "RankNet", "RankBoost", "AdaRank", "Coordinate Ascent",
                                                 "LambdaRank", "LambdaMART", "ListNet", "Random Forests", 
-                                                "Linear Regression", "WeightedLambdaMART" };
+                                                "Linear Regression", "WeightedLambdaMART", "WeightedAdaRank" };
 		RANKER_TYPE[] rType2 = new RANKER_TYPE[] { RANKER_TYPE.MART, RANKER_TYPE.RANKNET, 
                                                            RANKER_TYPE.RANKBOOST, RANKER_TYPE.ADARANK, 
                                                            RANKER_TYPE.COOR_ASCENT, RANKER_TYPE.LAMBDARANK, 
                                                            RANKER_TYPE.LAMBDAMART, RANKER_TYPE.LISTNET, 
                                                            RANKER_TYPE.RANDOM_FOREST, RANKER_TYPE.LINEAR_REGRESSION,
-														   RANKER_TYPE.WLAMBDAMART};
+														   RANKER_TYPE.WLAMBDAMART, RANKER_TYPE.WADARANK};
 		
 		String trainFile = "";
 		String featureDescriptionFile = "";

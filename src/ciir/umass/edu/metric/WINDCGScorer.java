@@ -10,9 +10,9 @@ import java.util.List;
 // Weighted Improved NDCG Scorer
 public class WINDCGScorer extends MetricScorer{
     protected HashMap<String, Double> idealIDCGScore = null;
-    protected double decayRate = 0.1;
-    protected double rewardRate = 2.0;
-    protected static double[] discount = null;//cache
+    protected double decayRate = 0.5;
+    protected double rewardRate = 1.0;
+    protected double[] discount = null;//cache
 
     public WINDCGScorer()
     {
@@ -20,10 +20,10 @@ public class WINDCGScorer extends MetricScorer{
         idealIDCGScore = new HashMap<>();
         if(discount == null)
         {
-            discount = new double[5000];
+            discount = new double[100];
             discount[0] = 1;
             for(int i = 1; i < discount.length; i++)
-                discount[i] = discount[i - 1] * (1 - decayRate);
+                discount[i] = discount[i - 1] * (1 - (decayRate / k));
         }
     }
 
@@ -74,7 +74,7 @@ public class WINDCGScorer extends MetricScorer{
     }
 
     // un-normalized score
-    protected double naiveScore(RankList rl)
+    public double naiveScore(RankList rl)
     {
         if(rl.size() == 0) return 0;
 
@@ -148,7 +148,6 @@ public class WINDCGScorer extends MetricScorer{
             {
                 // for each RankList we use the ideal as its weight in weighted average, therefore do not divide ideal here
                 changes[j][i] = changes[i][j] = (discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]));
-                // changes[j][i] = changes[i][j] = ((discount(i) - discount(j)) * (gain(rel[i]) - gain(rel[j]))) / idealScore;
             }
         }
 
@@ -167,13 +166,13 @@ public class WINDCGScorer extends MetricScorer{
             return discount[pos];
 
         //we need to expand our cache
-        int cacheSize = discount.length + 1000;
+        int cacheSize = discount.length + 100;
         while(cacheSize <= pos)
-            cacheSize += 1000;
+            cacheSize += 100;
         double[] tmp = new double[cacheSize];
         System.arraycopy(discount, 0, tmp, 0, discount.length);
         for(int i=discount.length;i<tmp.length;i++)
-            discount[i] = discount[i-1] * (1 - decayRate);
+            discount[i] = discount[i-1] * (1 - (decayRate / k));
         discount = tmp;
 
         return discount[pos];
