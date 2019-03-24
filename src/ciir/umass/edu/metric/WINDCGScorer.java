@@ -27,6 +27,20 @@ public class WINDCGScorer extends MetricScorer{
         }
     }
 
+    public WINDCGScorer(int k)
+    {
+        super();
+        this.k = k;
+        idealIDCGScore = new HashMap<>();
+        if(discount == null)
+        {
+            discount = new double[100];
+            discount[0] = 1;
+            for(int i = 1; i < discount.length; i++)
+                discount[i] = discount[i - 1] * (1 - (decayRate / k));
+        }
+    }
+
     public void setDecayRate(double dr) {decayRate = dr;}
     public void setRewardRate(double rr) {rewardRate = rr;}
 

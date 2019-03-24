@@ -1,9 +1,8 @@
 package ciir.umass.edu.eval;
 
-import ciir.umass.edu.learning.CoorAscent;
-import ciir.umass.edu.learning.DataPoint;
-import ciir.umass.edu.learning.Ranker;
-import ciir.umass.edu.learning.RankerFactory;
+import ciir.umass.edu.learning.*;
+import ciir.umass.edu.metric.NDCGScorer;
+import ciir.umass.edu.metric.WINDCGScorer;
 import ciir.umass.edu.utilities.FileUtils;
 import ciir.umass.edu.utilities.TmpFile;
 import org.junit.Ignore;
@@ -11,7 +10,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -202,6 +203,28 @@ public class EvaluatorTest {
       writeRandomData(dataFile);
       testRanker(dataFile, modelFile, rankFile, 6, "map");
     }
+  }
+  @Test
+  public void test() throws IOException {
+    List<RankList> l = new ArrayList<>();
+    List<DataPoint> ldp = new ArrayList<>();
+    ldp.add(new DenseDataPoint("1000 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    ldp.add(new DenseDataPoint("0 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    ldp.add(new DenseDataPoint("999 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    List<DataPoint> ldp2 = new ArrayList<>();
+    ldp2.add(new DenseDataPoint("999 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    ldp2.add(new DenseDataPoint("0 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    ldp2.add(new DenseDataPoint("1000 qid:1 1:0.47619048 2:0.042010855 3:7.3758204E-4"));
+    RankList rl1 = new RankList(ldp);
+    RankList rl2 = new RankList(ldp2);
+
+    NDCGScorer ndcgScorer = new NDCGScorer(2);
+    System.out.println("ndcg for list 1: " + ndcgScorer.score(rl1));
+    System.out.println("ndcg for list 2: " + ndcgScorer.score(rl2));
+
+    WINDCGScorer windcgScorer = new WINDCGScorer(2);
+    System.out.println("windcg for list 1: " + windcgScorer.score(rl1));
+    System.out.println("windcg for list 2: " + windcgScorer.score(rl2));
   }
 
   private void testRanker(TmpFile dataFile, TmpFile modelFile, TmpFile rankFile, int rnum, String measure) {

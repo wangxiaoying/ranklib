@@ -366,7 +366,7 @@ public class WAdaRank extends Ranker {
         }
         catch(Exception ex)
         {
-            throw RankLibError.create("Error in AdaRank::load(): ", ex);
+            throw RankLibError.create("Error in WAdaRank::load(): ", ex);
         }
     }
 
