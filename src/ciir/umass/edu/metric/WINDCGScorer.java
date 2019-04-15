@@ -186,7 +186,8 @@ public class WINDCGScorer extends MetricScorer{
         double[] tmp = new double[cacheSize];
         System.arraycopy(discount, 0, tmp, 0, discount.length);
         for(int i=discount.length;i<tmp.length;i++)
-            discount[i] = discount[i-1] * (1 - (decayRate / k));
+            tmp[i] = tmp[i-1] * (1 - (decayRate / k));
+
         discount = tmp;
 
         return discount[pos];

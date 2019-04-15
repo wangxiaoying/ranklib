@@ -1,0 +1,7 @@
+test/
+models/
+results/
+targets/
+data/
+*.txt
+*.iml
